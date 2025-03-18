@@ -1,0 +1,62 @@
+const fs = require('fs');
+const path = require('path');
+const claudeService = require('./claude-service');
+const Project = require('../models/Project');
+
+async function analyzeProjectSummary(fileId) {
+  try {
+    const filePath = path.join(__dirname, '../uploads', fileId);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Use Claude to analyze the project summary
+    const analysisPrompt = `
+      Analyze this project summary and extract the following information:
+      1. Project name and brief description
+      2. Target audience
+      3. Key messaging points
+      4. Brand tone and voice
+      5. Color preferences (if mentioned)
+      6. Content structure needs
+      
+      Format your response as a JSON object with these keys: projectName, description, targetAudience, keyMessages, brandTone, colorPreferences, contentStructure.
+      
+      Here's the project summary:
+      ${fileContent}
+    `;
+    
+    const analysisResponse = await claudeService.generateContent(analysisPrompt);
+    
+    // Parse the JSON response
+    const cleanedResponse = analysisResponse.trim().replace(/```json|```/g, '');
+    return JSON.parse(cleanedResponse);
+  } catch (error) {
+    console.error('Project analysis error:', error);
+    throw new Error(`Failed to analyze project: ${error.message}`);
+  }
+}
+
+async function getProjectById(projectId) {
+  return Project.findById(projectId).populate('createdBy', 'name email');
+}
+
+async function createProject(projectData) {
+  const project = new Project(projectData);
+  await project.save();
+  return project;
+}
+
+async function updateProject(projectId, updateData) {
+  return Project.findByIdAndUpdate(projectId, updateData, { new: true });
+}
+
+async function getAllProjects(userId) {
+  return Project.find({ createdBy: userId }).sort({ updatedAt: -1 });
+}
+
+module.exports = {
+  analyzeProjectSummary,
+  getProjectById,
+  createProject,
+  updateProject,
+  getAllProjects
+};
