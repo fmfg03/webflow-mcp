@@ -133,3 +133,32 @@ router.post('/create', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+// Add to routes/project.js
+
+// Delete project
+router.delete('/:projectId', authMiddleware, async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    
+    // Check if project exists and user has access
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ success: false, message: 'Project not found' });
+    }
+    
+    if (project.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+    
+    // Delete associated discussions
+    await Discussion.deleteMany({ project: projectId });
+    
+    // Delete project
+    await Project.findByIdAndDelete(projectId);
+    
+    res.json({ success: true, message: 'Project deleted successfully' });
+  } catch (error) {
+    console.error('Delete project error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
