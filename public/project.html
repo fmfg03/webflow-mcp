@@ -54,3 +54,1594 @@
             margin-left: 1rem;
         }
         .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            background-color: #fff;
+        }
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+        .user-message {
+            margin-left: auto;
+            text-align: right;
+        }
+        .assistant-message {
+            margin-right: auto;
+        }
+        .message-content {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+        }
+        .user-message .message-content {
+            background-color: #0066FF;
+            color: white;
+            border-top-right-radius: 0;
+        }
+        .assistant-message .message-content {
+            background-color: #f1f3f5;
+            border-top-left-radius: 0;
+        }
+        .system-message .message-content {
+            background-color: #ffc107;
+            color: #212529;
+            text-align: center;
+        }
+        .site-preview {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 0.25rem;
+        }
+        .tab-content {
+            padding: 1rem;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+        .prompt-button {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .spinner-container {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .site-pages-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+        }
+        .nav-tabs .nav-link.active {
+            color: #0066FF;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-sticky">
+            <div class="d-flex align-items-center justify-content-center mb-4">
+                <h5 class="m-0 p-2">Webflow MCP</h5>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard.html">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="bi bi-folder"></i> Project Details
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#sitePages" id="sitePagesLink">
+                        <i class="bi bi-file-earmark"></i> Site Pages
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#cmsList" id="cmsLink">
+                        <i class="bi bi-database"></i> CMS Collections
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#discussions" id="discussionsLink">
+                        <i class="bi bi-chat-dots"></i> Discussions
+                    </a>
+                </li>
+            </ul>
+            <button id="logoutBtn" class="btn btn-outline-secondary logout-btn">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </nav>
+
+    <main id="mainContent">
+        <div class="spinner-container" id="spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div id="projectDetails">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Project Details</li>
+                </ol>
+            </nav>
+
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h2 id="projectName">Project Name</h2>
+                    <p id="projectDescription" class="text-muted">Loading project details...</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-primary me-2" id="editProjectBtn">
+                        <i class="bi bi-pencil"></i> Edit Project
+                    </button>
+                    <button class="btn btn-success" id="publishBtn">
+                        <i class="bi bi-cloud-upload"></i> Publish
+                    </button>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Site Information</h5>
+                            <div class="site-preview mb-3" id="sitePreview"></div>
+                            <div id="siteInfo">
+                                <p><strong>Site Name:</strong> <span id="siteName">Loading...</span></p>
+                                <p><strong>Last Updated:</strong> <span id="siteUpdated">Loading...</span></p>
+                                <p><strong>Last Published:</strong> <span id="sitePublished">Loading...</span></p>
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm" id="viewSiteBtn" target="_blank">
+                                <i class="bi bi-box-arrow-up-right"></i> View in Webflow
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">AI Analysis</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab" aria-controls="discussion" aria-selected="false">Discussion</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="projectTabsContent">
+                                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                                    <h5>Project Summary</h5>
+                                    <p id="projectSummary">Loading project summary...</p>
+                                    <hr>
+                                    <h5>Recent Activity</h5>
+                                    <ul class="list-group" id="activityList">
+                                        <li class="list-group-item text-center">No recent activity</li>
+                                    </ul>
+                                </div>
+                                <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                                    <div id="analysisContent">
+                                        <div class="text-center">
+                                            <p>No AI analysis available yet.</p>
+                                            <button class="btn btn-primary" id="runAnalysisBtn">Run Analysis</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="discussion" role="tabpanel" aria-labelledby="discussion-tab">
+                                    <div class="chat-container mb-3" id="chatMessages">
+                                        <div class="message system-message">
+                                            <div class="message-content">Discussion started. Ask Claude about your project or website.</div>
+                                        </div>
+                                    </div>
+                                    <div class="prompt-buttons mb-3">
+                                        <button class="btn btn-sm btn-outline-primary prompt-button" data-prompt="content">Content Recommendations</button>
+                                        <button class="btn btn-sm btn-outline-primary prompt-button" data-prompt="design">Design Suggestions</button>
+                                        <button class="btn btn-sm btn-outline-primary prompt-button" data-prompt="structure">Structure Advice</button>
+                                        <button class="btn btn-sm btn-outline-primary prompt-button" data-prompt="critique">Request Critique</button>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Ask about your project or site..." id="messageInput">
+                                        <button class="btn btn-primary" type="button" id="sendMessageBtn">
+                                            <i class="bi bi-send"></i> Send
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sitePages" class="d-none">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#" id="backToProjectLink">Project Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Site Pages</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Site Pages</h2>
+                <div>
+                    <button class="btn btn-outline-primary me-2" id="refreshPagesBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="site-pages-list" id="pagesContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>Loading pages...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pageDetail" class="d-none">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#" id="backToProjectFromPageLink">Project Details</a></li>
+                    <li class="breadcrumb-item"><a href="#" id="backToPagesLink">Site Pages</a></li>
+                    <li class="breadcrumb-item active" aria-current="page" id="pageDetailTitle">Page Detail</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 id="pageDetailName">Page Name</h2>
+                <div>
+                    <button class="btn btn-primary" id="savePageChangesBtn">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Page Content</h5>
+                            <div id="pageContentEditor">
+                                <textarea class="form-control" id="pageHtmlContent" rows="20"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Page Properties</h5>
+                            <form id="pagePropertiesForm">
+                                <div class="mb-3">
+                                    <label for="pageTitle" class="form-label">Page Title</label>
+                                    <input type="text" class="form-control" id="pageTitle">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pagePath" class="form-label">Page Path</label>
+                                    <input type="text" class="form-control" id="pagePath" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pageLastUpdated" class="form-label">Last Updated</label>
+                                    <input type="text" class="form-control" id="pageLastUpdated" disabled>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">AI Assistance</h5>
+                            <p>Get Claude's help with this page content:</p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm" id="improveContentBtn">Improve Content</button>
+                                <button class="btn btn-outline-primary btn-sm" id="fixIssuesBtn">Fix Issues</button>
+                                <button class="btn btn-outline-primary btn-sm" id="suggestStylesBtn">Suggest Styles</button>
+                                <button class="btn btn-outline-primary btn-sm" id="rewriteBtn">Rewrite for Better Engagement</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cmsList" class="d-none">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#" id="backToProjectFromCmsLink">Project Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">CMS Collections</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>CMS Collections</h2>
+                <div>
+                    <button class="btn btn-outline-primary me-2" id="refreshCollectionsBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div id="collectionsContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>Loading collections...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="discussions" class="d-none">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#" id="backToProjectFromDiscussionsLink">Project Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Discussions</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Project Discussions</h2>
+                <div>
+                    <button class="btn btn-primary" id="newDiscussionBtn">
+                        <i class="bi bi-plus"></i> New Discussion
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div id="discussionsContainer">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>Loading discussions...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Discussion Modal -->
+    <div class="modal fade" id="newDiscussionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Start New Discussion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newDiscussionForm">
+                        <div class="mb-3">
+                            <label for="discussionTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="discussionTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="initialMessage" class="form-label">Initial Message</label>
+                            <textarea class="form-control" id="initialMessage" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="createDiscussionBtn">Create Discussion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentProjectId = null;
+        let currentSiteId = null;
+        let currentDiscussionId = null;
+        let currentPageId = null;
+        
+        // Check authentication and load project
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            
+            // Get project ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            currentProjectId = urlParams.get('id');
+            
+            if (!currentProjectId) {
+                window.location.href = '/dashboard.html';
+                return;
+            }
+            
+            // Load project details
+            loadProject(currentProjectId);
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation links
+            document.getElementById('sitePagesLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('sitePages');
+                loadPages();
+            });
+            
+            document.getElementById('cmsLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('cmsList');
+                loadCollections();
+            });
+            
+            document.getElementById('discussionsLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('discussions');
+                loadDiscussions();
+            });
+            
+            document.getElementById('backToProjectLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('projectDetails');
+            });
+            
+            document.getElementById('backToProjectFromPageLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('projectDetails');
+            });
+            
+            document.getElementById('backToPagesLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('sitePages');
+            });
+            
+            document.getElementById('backToProjectFromCmsLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('projectDetails');
+            });
+            
+            document.getElementById('backToProjectFromDiscussionsLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('projectDetails');
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                window.location.href = '/index.html';
+            });
+            
+            // Send message button
+            document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+            
+            // Message input enter key
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Prompt buttons
+            document.querySelectorAll('.prompt-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const promptType = this.dataset.prompt;
+                    sendPrompt(promptType);
+                });
+            });
+            
+            // Run analysis button
+            document.getElementById('runAnalysisBtn').addEventListener('click', runProjectAnalysis);
+            
+            // New discussion button
+            document.getElementById('newDiscussionBtn').addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('newDiscussionModal'));
+                modal.show();
+            });
+            
+            // Create discussion button
+            document.getElementById('createDiscussionBtn').addEventListener('click', createNewDiscussion);
+            
+            // AI assistance buttons for page
+            document.getElementById('improveContentBtn').addEventListener('click', function() {
+                getAIAssistanceForPage('improve');
+            });
+            
+            document.getElementById('fixIssuesBtn').addEventListener('click', function() {
+                getAIAssistanceForPage('fix');
+            });
+            
+            document.getElementById('suggestStylesBtn').addEventListener('click', function() {
+                getAIAssistanceForPage('styles');
+            });
+            
+            document.getElementById('rewriteBtn').addEventListener('click', function() {
+                getAIAssistanceForPage('rewrite');
+            });
+            
+            // Save page changes button
+            document.getElementById('savePageChangesBtn').addEventListener('click', savePageChanges);
+            
+            // Publish button
+            document.getElementById('publishBtn').addEventListener('click', publishSite);
+            
+            // Refresh buttons
+            document.getElementById('refreshPagesBtn').addEventListener('click', loadPages);
+            document.getElementById('refreshCollectionsBtn').addEventListener('click', loadCollections);
+        }
+        
+        // Show/hide sections
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('projectDetails').classList.add('d-none');
+            document.getElementById('sitePages').classList.add('d-none');
+            document.getElementById('pageDetail').classList.add('d-none');
+            document.getElementById('cmsList').classList.add('d-none');
+            document.getElementById('discussions').classList.add('d-none');
+            
+            // Show requested section
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            // Highlight active nav item
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Set active nav item
+            switch(sectionId) {
+                case 'projectDetails':
+                    document.querySelector('.nav-link[href="#"]').classList.add('active');
+                    break;
+                case 'sitePages':
+                    document.getElementById('sitePagesLink').classList.add('active');
+                    break;
+                case 'cmsList':
+                    document.getElementById('cmsLink').classList.add('active');
+                    break;
+                case 'discussions':
+                    document.getElementById('discussionsLink').classList.add('active');
+                    break;
+            }
+        }
+        
+        // Load project details
+        async function loadProject(projectId) {
+            showSpinner(true);
+            
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`/api/project/${projectId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const project = data.project;
+                    currentSiteId = project.siteId;
+                    
+                    // Set project details
+                    document.getElementById('projectName').textContent = project.name;
+                    document.getElementById('projectSummary').textContent = project.summary;
+                    
+                    // Load site details
+                    await loadSiteDetails(project.siteId);
+                    
+                    // Check if project has analysis
+                    if (project.analysis) {
+                        document.getElementById('analysisContent').innerHTML = `
+                            <h5>Project Analysis</h5>
+                            <div class="mb-3">
+                                <strong>Project Name:</strong> ${project.analysis.projectName || 'N/A'}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Description:</strong> ${project.analysis.description || 'N/A'}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Target Audience:</strong> ${project.analysis.targetAudience || 'N/A'}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Key Messages:</strong>
+                                <ul>
+                                    ${(project.analysis.keyMessages || []).map(msg => `<li>${msg}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Brand Tone:</strong> ${project.analysis.brandTone || 'N/A'}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Color Preferences:</strong>
+                                ${(project.analysis.colorPreferences || []).map(color => 
+                                    `<span class="badge bg-secondary me-1">${color}</span>`
+                                ).join('')}
+                            </div>
+                            <div class="mb-3">
+                                <strong>Content Structure:</strong> ${project.analysis.contentStructure || 'N/A'}
+                            </div>
+                        `;
+                    }
+                    
+                    // Initialize discussion
+                    initializeDiscussion(project._id);
+                    
+                } else {
+                    alert(`Error: ${data.error || 'Failed to load project'}`);
+                    window.location.href = '/dashboard.html';
+                }
+            } catch (error) {
+                console.error('Load project error:', error);
+                alert('Error loading project. Please try again.');
+                window.location.href = '/dashboard.html';
+            } finally {
+                showSpinner(false);
+            }
+        }
+        
+        // Load site details
+        async function loadSiteDetails(siteId) {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`/api/cms/sites/${siteId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const site = data.site;
+                    
+                    // Set site details
+                    document.getElementById('siteName').textContent = site.displayName;
+                    document.getElementById('siteUpdated').textContent = new Date(site.lastUpdated).toLocaleString();
+                    document.getElementById('sitePublished').textContent = site.lastPublished 
+                        ? new Date(site.lastPublished).toLocaleString()
+                        : 'Not published';
+                    
+                    // Set site preview
+                    if (site.previewUrl) {
+                        document.getElementById('sitePreview').style.backgroundImage = `url('${site.previewUrl}')`;
+                    }
+                    
+                    // Set view site button
+                    document.getElementById('viewSiteBtn').href = `https://webflow.com/design/${site.shortName}`;
+                    
+                } else {
+                    console.error('Load site details error:', data.error);
+                }
+// Load site pages
+async function loadPages() {
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    const pagesContainer = document.getElementById('pagesContainer');
+    
+    try {
+        const response = await fetch(`/api/cms/sites/${currentSiteId}/pages`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.pages.length === 0) {
+                pagesContainer.innerHTML = '<p class="text-center">No pages found for this site.</p>';
+                return;
+            }
+            
+            pagesContainer.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Page Name</th>
+                                <th>Path</th>
+                                <th>Last Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagesTableBody"></tbody>
+                    </table>
+                </div>
+            `;
+            
+            const tableBody = document.getElementById('pagesTableBody');
+            
+            data.pages.forEach(page => {
+                const updated = page.lastUpdated ? new Date(page.lastUpdated).toLocaleDateString() : 'N/A';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${page.name || page.title}</td>
+                    <td>${page.path || page.slug || 'N/A'}</td>
+                    <td>${updated}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary edit-page-btn" data-page-id="${page.id}">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-page-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const pageId = this.dataset.pageId;
+                    openPageEditor(pageId);
+                });
+            });
+            
+        } else {
+            pagesContainer.innerHTML = `<p class="text-center text-danger">${data.error || 'Failed to load pages'}</p>`;
+        }
+    } catch (error) {
+        console.error('Load pages error:', error);
+        pagesContainer.innerHTML = '<p class="text-center text-danger">Error loading pages. Please try again.</p>';
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Open page editor
+async function openPageEditor(pageId) {
+    showSpinner(true);
+    currentPageId = pageId;
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        const response = await fetch(`/api/cms/pages/${pageId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const page = data.page;
+            
+            // Set page details
+            document.getElementById('pageDetailName').textContent = page.name || page.title;
+            document.getElementById('pageDetailTitle').textContent = page.name || page.title;
+            document.getElementById('pageTitle').value = page.name || page.title;
+            document.getElementById('pagePath').value = page.path || page.slug || 'N/A';
+            document.getElementById('pageLastUpdated').value = page.lastUpdated ? new Date(page.lastUpdated).toLocaleString() : 'N/A';
+            document.getElementById('pageHtmlContent').value = page.html || '';
+            
+            // Show page detail section
+            showSection('pageDetail');
+        } else {
+            alert(`Error: ${data.error || 'Failed to load page details'}`);
+        }
+    } catch (error) {
+        console.error('Open page editor error:', error);
+        alert('Error loading page details. Please try again.');
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Save page changes
+async function savePageChanges() {
+    if (!currentPageId) return;
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    const title = document.getElementById('pageTitle').value;
+    const content = document.getElementById('pageHtmlContent').value;
+    
+    try {
+        const response = await fetch(`/api/cms/pages/${currentPageId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title,
+                html: content
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Page updated successfully!');
+            
+            // Update page details
+            document.getElementById('pageDetailName').textContent = title;
+            document.getElementById('pageDetailTitle').textContent = title;
+            document.getElementById('pageLastUpdated').value = new Date().toLocaleString();
+        } else {
+            alert(`Error: ${data.error || 'Failed to update page'}`);
+        }
+    } catch (error) {
+        console.error('Save page changes error:', error);
+        alert('Error saving page changes. Please try again.');
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Get AI assistance for page content
+async function getAIAssistanceForPage(assistanceType) {
+    if (!currentPageId) return;
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    const content = document.getElementById('pageHtmlContent').value;
+    
+    try {
+        let prompt;
+        
+        switch (assistanceType) {
+            case 'improve':
+                prompt = `Improve this web page content to make it more engaging and effective: ${content}`;
+                break;
+            case 'fix':
+                prompt = `Identify and fix any issues in this web page content, such as grammar, spelling, or structure problems: ${content}`;
+                break;
+            case 'styles':
+                prompt = `Suggest CSS styles that would improve the appearance of this HTML content: ${content}`;
+                break;
+            case 'rewrite':
+                prompt = `Rewrite this web page content to make it more engaging and persuasive for visitors: ${content}`;
+                break;
+            default:
+                prompt = `Analyze this web page content and suggest improvements: ${content}`;
+        }
+        
+        const response = await fetch('/api/ai-assistant/generate', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt,
+                options: {
+                    temperature: 0.7,
+                    maxTokens: 2000
+                }
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add AI suggestion to discussion tab
+            document.getElementById('discussion-tab').click(); // Switch to discussion tab
+            
+            addMessageToChat('user', `Get AI assistance: ${assistanceType} for current page content`);
+            addMessageToChat('assistant', data.content);
+            
+            // Suggestion for applying changes
+            if (assistanceType !== 'styles') {
+                const extractedContent = extractContentFromResponse(data.content, assistanceType);
+                if (extractedContent) {
+                    addMessageToChat('system', 'Would you like to apply these changes? <button class="btn btn-sm btn-primary apply-changes-btn">Apply Changes</button>');
+                    
+                    // Add event listener to apply changes button
+                    document.querySelector('.apply-changes-btn').addEventListener('click', function() {
+                        document.getElementById('pageHtmlContent').value = extractedContent;
+                        addMessageToChat('system', 'Changes applied. Remember to save your changes.');
+                    });
+                }
+            }
+        } else {
+            alert(`Error: ${data.error || 'Failed to get AI assistance'}`);
+        }
+    } catch (error) {
+        console.error('AI assistance error:', error);
+        alert('Error getting AI assistance. Please try again.');
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Extract content from AI response
+function extractContentFromResponse(response, type) {
+    // Look for HTML content between ```html and ``` tags
+    const htmlMatch = response.match(/```html\n([\s\S]*?)\n```/);
+    if (htmlMatch && htmlMatch[1]) {
+        return htmlMatch[1].trim();
+    }
+    
+    // For rewrites, look for content between triple quotes if no HTML tags
+    if (type === 'rewrite' || type === 'improve') {
+        const contentMatch = response.match(/```\n([\s\S]*?)\n```/);
+        if (contentMatch && contentMatch[1]) {
+            return contentMatch[1].trim();
+        }
+    }
+    
+    return null;
+}
+
+// Load CMS collections
+async function loadCollections() {
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    const collectionsContainer = document.getElementById('collectionsContainer');
+    
+    try {
+        const response = await fetch(`/api/cms/sites/${currentSiteId}/collections`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.collections.length === 0) {
+                collectionsContainer.innerHTML = '<p class="text-center">No collections found for this site.</p>';
+                return;
+            }
+            
+            collectionsContainer.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Collection Name</th>
+                                <th>Items</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="collectionsTableBody"></tbody>
+                    </table>
+                </div>
+            `;
+            
+            const tableBody = document.getElementById('collectionsTableBody');
+            
+            data.collections.forEach(collection => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${collection.name}</td>
+                    <td>${collection.itemCount || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary view-collection-btn" data-collection-id="${collection.id}">
+                            <i class="bi bi-eye"></i> View Items
+                        </button>
+                        <button class="btn btn-sm btn-outline-success ai-content-btn" data-collection-id="${collection.id}">
+                            <i class="bi bi-robot"></i> Generate Content
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to collection buttons
+            // (These would be implemented in a real application)
+            
+        } else {
+            collectionsContainer.innerHTML = `<p class="text-center text-danger">${data.error || 'Failed to load collections'}</p>`;
+        }
+    } catch (error) {
+        console.error('Load collections error:', error);
+        collectionsContainer.innerHTML = '<p class="text-center text-danger">Error loading collections. Please try again.</p>';
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Initialize discussion
+async function initializeDiscussion(projectId) {
+    // Check if there's an existing discussion
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        const response = await fetch(`/api/discussion/project/${projectId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.discussions.length > 0) {
+            // Use the most recent discussion
+            loadDiscussion(data.discussions[0]._id);
+        } else {
+            // Create a new discussion
+            const createResponse = await fetch('/api/discussion/create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    projectId,
+                    title: 'Project Discussion'
+                })
+            });
+            
+            const createData = await createResponse.json();
+            
+            if (createData.success) {
+                currentDiscussionId = createData.discussion._id;
+                addMessageToChat('system', 'New discussion started. Ask Claude about your project or website.');
+            } else {
+                console.error('Initialize discussion error:', createData.error);
+            }
+        }
+    } catch (error) {
+        console.error('Initialize discussion error:', error);
+    }
+}
+
+// Load discussion
+async function loadDiscussion(discussionId) {
+    const token = localStorage.getItem('authToken');
+    currentDiscussionId = discussionId;
+    
+    try {
+        const response = await fetch(`/api/discussion/${discussionId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            // Add system message
+            addMessageToChat('system', 'Discussion loaded. Continue your conversation with Claude.');
+            
+            // Add messages
+            data.discussion.messages.forEach(msg => {
+                if (msg.role !== 'system') {
+                    addMessageToChat(msg.role, msg.content);
+                }
+            });
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            console.error('Load discussion error:', data.error);
+        }
+    } catch (error) {
+        console.error('Load discussion error:', error);
+    }
+}
+
+// Load all discussions
+async function loadDiscussions() {
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    const discussionsContainer = document.getElementById('discussionsContainer');
+    
+    try {
+        const response = await fetch(`/api/discussion/project/${currentProjectId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.discussions.length === 0) {
+                discussionsContainer.innerHTML = '<p class="text-center">No discussions found. Start a new discussion to get AI assistance.</p>';
+                return;
+            }
+            
+            discussionsContainer.innerHTML = `
+                <div class="list-group">
+                    ${data.discussions.map(discussion => `
+                        <a href="#" class="list-group-item list-group-item-action discussion-item" data-discussion-id="${discussion._id}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">${discussion.title}</h5>
+                                <small>${new Date(discussion.lastActive).toLocaleString()}</small>
+                            </div>
+                            <p class="mb-1">
+                                ${discussion.messages.length} messages
+                            </p>
+                            <small>Created by: ${discussion.createdBy.name || discussion.createdBy.email}</small>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Add event listeners to discussion items
+            document.querySelectorAll('.discussion-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const discussionId = this.dataset.discussionId;
+                    
+                    // Switch to project details and discussion tab
+                    showSection('projectDetails');
+                    document.getElementById('discussion-tab').click();
+                    
+                    // Load discussion
+                    loadDiscussion(discussionId);
+                });
+            });
+            
+        } else {
+            discussionsContainer.innerHTML = `<p class="text-center text-danger">${data.error || 'Failed to load discussions'}</p>`;
+        }
+    } catch (error) {
+        console.error('Load discussions error:', error);
+        discussionsContainer.innerHTML = '<p class="text-center text-danger">Error loading discussions. Please try again.</p>';
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Create new discussion
+async function createNewDiscussion() {
+    const title = document.getElementById('discussionTitle').value;
+    const initialMessage = document.getElementById('initialMessage').value;
+    
+    if (!title || !initialMessage) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        const createResponse = await fetch('/api/discussion/create', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                projectId: currentProjectId,
+                title
+            })
+        });
+        
+        const createData = await createResponse.json();
+        
+        if (createData.success) {
+            const discussionId = createData.discussion._id;
+            
+            // Add initial message
+            const messageResponse = await fetch(`/api/discussion/${discussionId}/message`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: initialMessage
+                })
+            });
+            
+            const messageData = await messageResponse.json();
+            
+            if (messageData.success) {
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('newDiscussionModal')).hide();
+                
+                // Switch to project details and discussion tab
+                showSection('projectDetails');
+                document.getElementById('discussion-tab').click();
+                
+                // Load discussion
+                loadDiscussion(discussionId);
+            } else {
+                throw new Error(messageData.error || 'Failed to add message');
+            }
+        } else {
+            throw new Error(createData.error || 'Failed to create discussion');
+        }
+    } catch (error) {
+        console.error('Create discussion error:', error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Send message in discussion
+async function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    
+    if (!message || !currentDiscussionId) return;
+    
+    // Clear input
+    messageInput.value = '';
+    
+    // Add message to chat
+    addMessageToChat('user', message);
+    
+    // Show typing indicator
+    addTypingIndicator();
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        const response = await fetch(`/api/discussion/${currentDiscussionId}/message`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Remove typing indicator
+        removeTypingIndicator();
+        
+        if (data.success) {
+            // Add assistant response
+            addMessageToChat('assistant', data.assistantMessage);
+        } else {
+            addMessageToChat('system', `Error: ${data.error || 'Failed to send message'}`);
+        }
+    } catch (error) {
+        console.error('Send message error:', error);
+        removeTypingIndicator();
+        addMessageToChat('system', `Error: ${error.message}`);
+    }
+}
+
+// Send predefined prompt
+function sendPrompt(promptType) {
+    let promptText;
+    
+    switch(promptType) {
+        case 'content':
+            promptText = 'What content improvements would you recommend for my website based on the project goals?';
+            break;
+        case 'design':
+            promptText = 'What design improvements would you suggest for my website to better align with the project goals?';
+            break;
+        case 'structure':
+            promptText = 'How can I improve the structure and organization of my website to enhance user experience?';
+            break;
+        case 'critique':
+            promptText = 'Please provide a comprehensive critique of my current website based on best practices and the project goals.';
+            break;
+        default:
+            promptText = 'What suggestions do you have for improving my website?';
+    }
+    
+    document.getElementById('messageInput').value = promptText;
+    sendMessage();
+}
+
+// Add message to chat
+function addMessageToChat(role, content) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${role}-message`;
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    // Handle HTML content from Claude
+    if (role === 'assistant' && content.includes('<')) {
+        // For safety, we'll still use textContent and then handle specific HTML we want to allow
+        contentDiv.textContent = content;
+        
+        // Replace code blocks with formatted HTML
+        contentDiv.innerHTML = contentDiv.innerHTML.replace(/```(\w*)\n([\s\S]*?)\n```/g, function(match, language, code) {
+            return `<pre class="bg-light p-2 mt-2 mb-2 rounded"><code class="language-${language}">${code}</code></pre>`;
+        });
+        
+        // Replace line breaks with <br>
+        contentDiv.innerHTML = contentDiv.innerHTML.replace(/\n/g, '<br>');
+        
+    } else {
+        contentDiv.textContent = content;
+    }
+    
+    messageDiv.appendChild(contentDiv);
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Add typing indicator
+function addTypingIndicator() {
+    const chatMessages = document.getElementById('chatMessages');
+    const indicatorDiv = document.createElement('div');
+    indicatorDiv.id = 'typingIndicator';
+    indicatorDiv.className = 'message assistant-message';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = '<div class="spinner-grow spinner-grow-sm me-1" role="status"></div><div class="spinner-grow spinner-grow-sm me-1" role="status"></div><div class="spinner-grow spinner-grow-sm" role="status"></div>';
+    
+    indicatorDiv.appendChild(contentDiv);
+    chatMessages.appendChild(indicatorDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Remove typing indicator
+function removeTypingIndicator() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Run project analysis
+async function runProjectAnalysis() {
+    if (!currentProjectId) return;
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        // First, get project details
+        const projectResponse = await fetch(`/api/project/${currentProjectId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const projectData = await projectResponse.json();
+        
+        if (!projectData.success) {
+            throw new Error(projectData.error || 'Failed to load project');
+        }
+        
+        const project = projectData.project;
+        
+        // Get site details
+        const siteResponse = await fetch(`/api/cms/sites/${project.siteId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const siteData = await siteResponse.json();
+        
+        if (!siteData.success) {
+            throw new Error(siteData.error || 'Failed to load site');
+        }
+        
+        // Generate AI analysis
+        const prompt = `
+            Analyze this website project and provide recommendations:
+            
+            Project Summary: ${project.summary}
+            
+            Site Information:
+            - Name: ${siteData.site.displayName}
+            - Last Updated: ${new Date(siteData.site.lastUpdated).toLocaleString()}
+            
+            Based on this information, provide a comprehensive analysis including:
+            1. Project name and brief description
+            2. Target audience
+            3. Key messaging points
+            4. Brand tone and voice
+            5. Color preferences (if mentioned)
+            6. Content structure needs
+            
+            Format your response as a structured analysis.
+        `;
+        
+        const analysisResponse = await fetch('/api/ai-assistant/generate', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt,
+                options: {
+                    temperature: 0.7,
+                    maxTokens: 2000
+                }
+            })
+        });
+        
+        const analysisData = await analysisResponse.json();
+        
+        if (analysisData.success) {
+            // Display analysis
+            document.getElementById('analysisContent').innerHTML = `
+                <h5>AI Project Analysis</h5>
+                <div class="bg-light p-3 rounded">
+                    ${analysisData.content.replace(/\n/g, '<br>')}
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm" id="saveAnalysisBtn">Save This Analysis</button>
+                </div>
+            `;
+            
+            // Add event listener to save button
+            document.getElementById('saveAnalysisBtn').addEventListener('click', function() {
+                saveProjectAnalysis(analysisData.content);
+            });
+        } else {
+            throw new Error(analysisData.error || 'Failed to generate analysis');
+        }
+    } catch (error) {
+        console.error('Run project analysis error:', error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Save project analysis
+async function saveProjectAnalysis(analysisContent) {
+    if (!currentProjectId) return;
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        // Parse analysis to extract structured data
+        // (In a real app, this would be more robust)
+        const projectName = analysisContent.match(/Project Name:(.+)/) ? analysisContent.match(/Project Name:(.+)/)[1].trim() : '';
+        const description = analysisContent.match(/Description:(.+)/) ? analysisContent.match(/Description:(.+)/)[1].trim() : '';
+        const targetAudience = analysisContent.match(/Target Audience:(.+)/) ? analysisContent.match(/Target Audience:(.+)/)[1].trim() : '';
+        const brandTone = analysisContent.match(/Brand Tone:(.+)/) ? analysisContent.match(/Brand Tone:(.+)/)[1].trim() : '';
+        
+        // Key messages (simplified)
+        const keyMessages = [];
+        const keyMessagesMatch = analysisContent.match(/Key Messages:([\s\S]*?)(?=Brand Tone:|$)/);
+        if (keyMessagesMatch) {
+            const messagesText = keyMessagesMatch[1];
+            const messageLines = messagesText.split('\n').filter(line => line.trim().startsWith('-'));
+            messageLines.forEach(line => {
+                const message = line.replace('-', '').trim();
+                if (message) {
+                    keyMessages.push(message);
+                }
+            });
+        }
+        
+        // Update project with analysis
+        const response = await fetch(`/api/project/${currentProjectId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                analysis: {
+                    projectName,
+                    description,
+                    targetAudience,
+                    keyMessages,
+                    brandTone,
+                    raw: analysisContent
+                }
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Analysis saved successfully!');
+        } else {
+            throw new Error(data.error || 'Failed to save analysis');
+        }
+    } catch (error) {
+        console.error('Save project analysis error:', error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Publish site
+async function publishSite() {
+    if (!currentSiteId) return;
+    
+    if (!confirm('Are you sure you want to publish this site?')) {
+        return;
+    }
+    
+    showSpinner(true);
+    
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        const response = await fetch(`/api/cms/sites/${currentSiteId}/publish`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Site published successfully!');
+            
+            // Update site details
+            loadSiteDetails(currentSiteId);
+        } else {
+            throw new Error(data.error || 'Failed to publish site');
+        }
+    } catch (error) {
+        console.error('Publish site error:', error);
+        alert(`Error: ${error.message}`);
+    } finally {
+        showSpinner(false);
+    }
+}
+
+// Show/hide spinner
+function showSpinner(show) {
+    const spinner = document.getElementById('spinner');
+    spinner.style.display = show ? 'flex' : 'none';
+}                
