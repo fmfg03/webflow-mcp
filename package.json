@@ -1,0 +1,4 @@
+cd webflow-mcp
+npm init -y
+npm install express mongoose dotenv cors helmet jsonwebtoken axios winston express-rate-limit nodemailer multer socket.io @anthropic-ai/sdk axios-retry bcrypt cookie-parser
+npm install -D nodemon
