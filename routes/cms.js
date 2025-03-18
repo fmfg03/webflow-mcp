@@ -144,4 +144,39 @@ router.post('/sites/:siteId/publish', authMiddleware, async (req, res) => {
     const publishResult = await webflowService.publishSite(siteId, domains);
     res.json({ success: true, result: publishResult });
   } catch (error) {
-    console.error('Publish site error:', e
+    console.error('Publish site error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get page by ID
+router.get('/pages/:pageId', authMiddleware, async (req, res) => {
+  try {
+    const { pageId } = req.params;
+    const page = await webflowService.getPageDetails(pageId);
+    res.json({ success: true, page });
+  } catch (error) {
+    console.error('Get page error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update page content
+router.put('/pages/:pageId', authMiddleware, async (req, res) => {
+  try {
+    if (!req.permissions.includes('write')) {
+      return res.status(403).json({ message: 'Permission denied' });
+    }
+    
+    const { pageId } = req.params;
+    const updates = req.body;
+    
+    const updatedPage = await webflowService.updatePageContent(pageId, updates);
+    res.json({ success: true, page: updatedPage });
+  } catch (error) {
+    console.error('Update page error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+module.exports = router;
