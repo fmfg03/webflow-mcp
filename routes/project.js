@@ -8,6 +8,7 @@ const projectService = require('../services/project-service');
 const claudeService = require('../services/claude-service');
 const webflowService = require('../services/webflow-service');
 const Project = require('../models/Project');
+const Discussion = require('../models/Discussion');
 
 // Configure storage
 const storage = multer.diskStorage({
