@@ -312,35 +312,24 @@
     }
 
     // Load sites for the "New Project" modal dropdown
-    async function loadSitesForSelect() {
-      const token = localStorage.getItem('authToken');
-      const siteSelect = document.getElementById('siteSelect');
-
-      try {
-        const response = await fetch('/api/cms/sites', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        const data = await response.json();
-
-        if (data.success) {
-          siteSelect.innerHTML = '<option value="">Select a site</option>';
-          data.sites.forEach((site) => {
-            const option = document.createElement('option');
-            option.value = site.id;
-            option.textContent = site.displayName;
-            siteSelect.appendChild(option);
-          });
-        } else {
-          siteSelect.innerHTML = '<option value="">Error loading sites</option>';
-        }
-      } catch (error) {
-        console.error('Load sites for select error:', error);
-        siteSelect.innerHTML = '<option value="">Error loading sites</option>';
-      }
-    }
-
+async function loadSitesForSelect() {
+  const siteSelect = document.getElementById('siteSelect');
+  
+  try {
+    // Use hardcoded Hotel 28 site
+    siteSelect.innerHTML = '<option value="">Select a site</option>';
+    
+    const option = document.createElement('option');
+    option.value = "67bcaa38d02f184175749f62";
+    option.textContent = "Hotel 28";
+    siteSelect.appendChild(option);
+    
+  } catch (error) {
+    console.error('Load sites for select error:', error);
+    siteSelect.innerHTML = '<option value="">Error loading sites</option>';
+  }
+}
+    
     // Load existing projects
     async function loadProjects() {
       const token = localStorage.getItem('authToken');
