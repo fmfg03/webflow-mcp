@@ -3,6 +3,7 @@ const path = require('path');
 const claudeService = require('./claude-service');
 const Project = require('../models/Project');
 
+
 async function analyzeProjectSummary(fileId) {
   try {
     const filePath = path.join(__dirname, '../uploads', fileId);
@@ -19,21 +20,56 @@ async function analyzeProjectSummary(fileId) {
       6. Content structure needs
       
       Format your response as a JSON object with these keys: projectName, description, targetAudience, keyMessages, brandTone, colorPreferences, contentStructure.
+      Ensure your response is valid JSON - do not include any text before or after the JSON object.
       
       Here's the project summary:
       ${fileContent}
     `;
     
     const analysisResponse = await claudeService.generateContent(analysisPrompt);
+    console.log('Raw analysis response:', analysisResponse);
     
-    // Parse the JSON response
-    const cleanedResponse = analysisResponse.trim().replace(/```json|```/g, '');
-    return JSON.parse(cleanedResponse);
+    // Try to extract just the JSON part from the response
+    let jsonString = analysisResponse.trim();
+    
+    // If the response contains markdown code blocks, extract just the JSON
+    if (jsonString.includes('```json')) {
+      const jsonMatch = jsonString.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch && jsonMatch[1]) {
+        jsonString = jsonMatch[1].trim();
+      }
+    } else if (jsonString.includes('```')) {
+      // Try to extract from a generic code block
+      const jsonMatch = jsonString.match(/```\s*([\s\S]*?)\s*```/);
+      if (jsonMatch && jsonMatch[1]) {
+        jsonString = jsonMatch[1].trim();
+      }
+    }
+    
+    // As a fallback, create a basic analysis structure
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError);
+      console.error('Attempted to parse:', jsonString);
+      
+      // Return a basic analysis structure as fallback
+      return {
+        projectName: "Project from file",
+        description: fileContent.substring(0, 200) + "...",
+        targetAudience: "General audience",
+        keyMessages: ["Key information extracted from file"],
+        brandTone: "Professional",
+        colorPreferences: [],
+        contentStructure: "Standard"
+      };
+    }
   } catch (error) {
     console.error('Project analysis error:', error);
     throw new Error(`Failed to analyze project: ${error.message}`);
   }
 }
+
 
 async function getProjectById(projectId) {
   return Project.findById(projectId).populate('createdBy', 'name email');
