@@ -35,7 +35,17 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Middleware
-app.use(helmet());
+// In app.js, enhance the MongoDB connection section
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log('MongoDB connected successfully');
+    console.log(`Connected to: ${process.env.MONGO_URI}`);
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    console.error('Please check if MongoDB is running and the connection string is correct');
+  });
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
