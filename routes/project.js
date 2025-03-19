@@ -40,17 +40,21 @@ router.get('/', authMiddleware, async (req, res) => {
 // Get single project
 router.get('/:projectId', authMiddleware, async (req, res) => {
   try {
+    console.log(`Fetching project with ID: ${req.params.projectId}`);
     const project = await projectService.getProjectById(req.params.projectId);
     
     if (!project) {
+      console.log('Project not found');
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
     
     // Check if user owns the project
     if (project.createdBy._id.toString() !== req.user.id && req.user.role !== 'admin') {
+      console.log('Access denied - user does not own the project');
       return res.status(403).json({ success: false, message: 'Access denied' });
     }
     
+    console.log('Project found, returning data');
     res.json({ success: true, project });
   } catch (error) {
     console.error('Get project error:', error);
