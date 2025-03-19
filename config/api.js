@@ -12,7 +12,7 @@ module.exports = {
   },
   claude: {
     apiKey: process.env.CLAUDE_API_KEY,
-    defaultModel: process.env.CLAUDE_MODEL || 'claude-3-opus-20240229',
+    defaultModel: process.env.CLAUDE_MODEL || 'claude-3.7-sonnet-20250219',
     defaultMaxTokens: 2000,
     defaultTemperature: 0.7
   }
