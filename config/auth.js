@@ -2,7 +2,7 @@
 require('dotenv').config();
 
 module.exports = {
-  jwtSecret: process.env.JWT_SECRET || 'your_very_secure_jwt_secret_please_change_in_production',
+  jwtSecret: process.env.JWT_SECRET || '5dbf0b94348be96a34a95d813ccf159f74e10a4e9d30d94612fb97f234b42808',
   jwtExpiration: '7d',
   saltRounds: 10
 };
