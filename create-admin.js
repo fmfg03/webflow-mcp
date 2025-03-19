@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 
 const adminEmail = 'admin@automat.ing';
-const adminPassword = 'securePassword123'; // Change this to a secure password
+const adminPassword = 'Tanner#2B62E'; // Change this to a secure password
 
 async function createAdminUser() {
   try {
