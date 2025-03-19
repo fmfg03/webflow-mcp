@@ -63,10 +63,7 @@ async function analyzeProjectSummary(fileId) {
     throw new Error(`Failed to analyze project: ${error.message}`);
   }
 }
-
-
-
-    
+   
     // As a fallback, create a basic analysis structure
     try {
       return JSON.parse(jsonString);
