@@ -7,7 +7,7 @@ async function analyzeProjectSummary(fileId) {
   try {
     const filePath = path.join(__dirname, '../uploads', fileId);
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    
+
     // Use Claude to analyze the project summary
     const analysisPrompt = `
       Analyze this project summary and extract the following information:
@@ -24,70 +24,43 @@ async function analyzeProjectSummary(fileId) {
       Here's the project summary:
       ${fileContent}
     `;
-    
+
     const analysisResponse = await claudeService.generateContent(analysisPrompt);
     console.log('Raw analysis response:', analysisResponse);
-    
-    // Try to extract just the JSON part from the response
+
     let jsonString = analysisResponse.trim();
-    
-    // Look for a JSON object in the response
+
+    // Extract JSON from response
     const jsonRegex = /(\{[\s\S]*\})/;
     const jsonMatch = jsonString.match(jsonRegex);
-    
+
     if (jsonMatch && jsonMatch[1]) {
       jsonString = jsonMatch[1].trim();
       console.log('Extracted JSON:', jsonString);
     }
-    
-    // As a fallback, create a basic analysis structure
-    try {
-      return JSON.parse(jsonString);
-    } catch (parseError) {
-      console.error('JSON parsing error:', parseError);
-      console.error('Attempted to parse:', jsonString);
-      
-      // Return a basic analysis structure as fallback
-      return {
-        projectName: "Project from file",
-        description: fileContent.substring(0, 200) + "...",
-        targetAudience: "General audience",
-        keyMessages: ["Key information extracted from file"],
-        brandTone: "Professional",
-        colorPreferences: [],
-        contentStructure: "Standard"
-      };
-    }
-  } catch (error) {
-    console.error('Project analysis error:', error);
-    throw new Error(`Failed to analyze project: ${error.message}`);
-  }
-}
-   
-    // As a fallback, create a basic analysis structure
-    try {
-      return JSON.parse(jsonString);
-    } catch (parseError) {
-      console.error('JSON parsing error:', parseError);
-      console.error('Attempted to parse:', jsonString);
-      
-      // Return a basic analysis structure as fallback
-      return {
-        projectName: "Project from file",
-        description: fileContent.substring(0, 200) + "...",
-        targetAudience: "General audience",
-        keyMessages: ["Key information extracted from file"],
-        brandTone: "Professional",
-        colorPreferences: [],
-        contentStructure: "Standard"
-      };
-    }
-  } catch (error) {
-    console.error('Project analysis error:', error);
-    throw new Error(`Failed to analyze project: ${error.message}`);
-  }
-}
 
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON parsing error:', parseError);
+      console.error('Attempted to parse:', jsonString);
+
+      // Return basic fallback analysis
+      return {
+        projectName: "Project from file",
+        description: fileContent.substring(0, 200) + "...",
+        targetAudience: "General audience",
+        keyMessages: ["Key information extracted from file"],
+        brandTone: "Professional",
+        colorPreferences: [],
+        contentStructure: "Standard"
+      };
+    }
+  } catch (error) {
+    console.error('Project analysis error:', error);
+    throw new Error(`Failed to analyze project: ${error.message}`);
+  }
+}
 
 async function getProjectById(projectId) {
   return Project.findById(projectId).populate('createdBy', 'name email');
