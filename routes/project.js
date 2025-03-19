@@ -133,9 +133,6 @@ router.post('/create', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router;
-// Add to routes/project.js
-
 // Delete project
 router.delete('/:projectId', authMiddleware, async (req, res) => {
   try {
@@ -163,3 +160,5 @@ router.delete('/:projectId', authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+module.exports = router;
