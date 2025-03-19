@@ -1,5 +1,44 @@
 const axios = require('axios');
-const axiosRetry = require('axios-retry');
+// Try different import formats for axios-retry
+let axiosRetry;
+try {
+  // First attempt: standard import
+  axiosRetry = require('axios-retry');
+  // Check if it's a default export
+  if (typeof axiosRetry !== 'function' && axiosRetry.default) {
+    axiosRetry = axiosRetry.default;
+  }
+} catch (error) {
+  console.error('Error importing axios-retry:', error);
+  // Fallback: implement a simple retry mechanism
+  axiosRetry = function(client, options) {
+    // Simple implementation that attaches interceptors
+    client.interceptors.response.use(null, async (error) => {
+      const { config } = error;
+      if (!config || !config.retry) {
+        config.retry = 0;
+      }
+      
+      if (config.retry >= (options.retries || 3)) {
+        return Promise.reject(error);
+      }
+      
+      config.retry += 1;
+      const delay = options.retryDelay ? options.retryDelay(config.retry) : 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return client(config);
+    });
+  };
+  
+  // Add missing functions
+  axiosRetry.exponentialDelay = (retryNumber) => {
+    return Math.pow(2, retryNumber) * 1000;
+  };
+  
+  axiosRetry.isNetworkOrIdempotentRequestError = (error) => {
+    return !error.response || (error.response.status >= 500 && error.response.status <= 599);
+  };
+}
 
 const webflowClient = axios.create({
   baseURL: 'https://api.webflow.com',
